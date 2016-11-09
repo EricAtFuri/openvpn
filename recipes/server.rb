@@ -27,6 +27,7 @@ node.override['openvpn']['key']['size'] = node['openvpn']['key']['size'].to_i
 key_dir  = node['openvpn']['key_dir']
 key_size = node['openvpn']['key']['size']
 message_digest = node['openvpn']['key']['message_digest']
+client_config_dir = node['openvpn']['config']['client-config-dir']
 
 directory key_dir do
   owner 'root'
@@ -144,6 +145,14 @@ end
 remote_file '/etc/openvpn/crl.pem' do
   mode   0644
   source "file://#{node['openvpn']['key_dir']}/crl.pem"
+end
+
+directory "#{client_config_dir}" do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+  action :create
+  only_if { client_config_dir }
 end
 
 openvpn_conf 'server' do
